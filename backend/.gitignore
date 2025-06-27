@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.env
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
