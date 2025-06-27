@@ -268,14 +268,24 @@ function App() {
                   <div className="flex items-start justify-end space-x-4">
                     <div className="flex-1 flex justify-end">
                       <div className="max-w-3xl">
-                        <div className="bg-gray-600 text-white px-6 py-4 rounded-2xl rounded-tr-sm shadow-sm">
+                        <div
+                          className={`px-6 py-4 rounded-2xl rounded-tr-sm shadow-sm ${
+                            isDarkMode
+                              ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white"
+                              : "bg-gray-600 text-white"
+                          }`}>
                           <p className="leading-relaxed text-base">
                             {msg.message}
                           </p>
                         </div>
                       </div>
                     </div>
-                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center shadow-sm">
+                    <div
+                      className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
+                        isDarkMode
+                          ? "bg-gradient-to-br from-blue-600 to-blue-700"
+                          : "bg-gray-600"
+                      }`}>
                       <HiUser className="text-lg text-white" />
                     </div>
                   </div>
@@ -284,25 +294,25 @@ function App() {
                   <div className="flex items-start space-x-4">
                     <div
                       className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${
-                        isDarkMode ? "bg-gray-800" : "bg-gray-100"
+                        isDarkMode
+                          ? "bg-gradient-to-br from-blue-600 to-purple-600"
+                          : "bg-gradient-to-br from-blue-500 to-purple-500"
                       }`}>
-                      <HiSparkles
-                        className={`text-lg ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
-                      />
+                      <HiSparkles className="text-lg text-white" />
                     </div>
                     <div className="flex-1">
                       <div className="inline-block max-w-3xl">
                         <div
                           className={`px-6 py-4 rounded-2xl rounded-tl-sm shadow-sm border ${
                             isDarkMode
-                              ? "bg-gray-800 border-gray-700"
+                              ? "bg-gray-800 border-gray-600 shadow-lg"
                               : "bg-white border-gray-200"
                           }`}>
                           <div
                             className={`prose prose-sm max-w-none ${
-                              isDarkMode ? "prose-invert" : ""
+                              isDarkMode
+                                ? "prose-invert prose-headings:text-gray-100 prose-p:text-gray-200 prose-strong:text-gray-100 prose-code:text-blue-300 prose-code:bg-gray-700"
+                                : ""
                             } prose-table:table-auto prose-th:text-left prose-th:font-semibold prose-th:border prose-th:border-gray-300 prose-th:px-4 prose-th:py-2 prose-td:border prose-td:border-gray-300 prose-td:px-4 prose-td:py-2`}>
                             <ReactMarkdown
                               remarkPlugins={[remarkGfm]}
@@ -322,7 +332,9 @@ function App() {
                                 thead: ({ children }) => (
                                   <thead
                                     className={
-                                      isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                                      isDarkMode
+                                        ? "bg-gray-700 border-gray-600"
+                                        : "bg-gray-100 border-gray-300"
                                     }>
                                     {children}
                                   </thead>
@@ -331,8 +343,8 @@ function App() {
                                   <th
                                     className={`border px-4 py-2 text-left font-semibold ${
                                       isDarkMode
-                                        ? "border-gray-600 text-gray-200"
-                                        : "border-gray-300 text-gray-900"
+                                        ? "border-gray-600 text-gray-100 bg-gray-700"
+                                        : "border-gray-300 text-gray-900 bg-gray-50"
                                     }`}>
                                     {children}
                                   </th>
@@ -341,8 +353,8 @@ function App() {
                                   <td
                                     className={`border px-4 py-2 ${
                                       isDarkMode
-                                        ? "border-gray-600 text-gray-300"
-                                        : "border-gray-300 text-gray-700"
+                                        ? "border-gray-600 text-gray-200 bg-gray-800"
+                                        : "border-gray-300 text-gray-700 bg-white"
                                     }`}>
                                     {children}
                                   </td>
