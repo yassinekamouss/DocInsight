@@ -1,7 +1,20 @@
 # RAG Application: Document Q&A with Google Gemini AI
 
 <p align="center">
-  <img src="rag-frontend/src/assets/Capture_d'écran.png" alt="Application Screenshot" width="600"/>
+  <img src="https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI">
+  <img src="https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Google_Gemini-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google Gemini">
+  <img src="https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white" alt="LangChain">
+  <img src="https://img.shields.io/badge/FAISS-FF6B35?style=for-the-badge&logo=meta&logoColor=white" alt="FAISS">
+  <img src="https://img.shields.io/badge/Web_Speech_API-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white" alt="Web Speech API">
+  <img src="https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white" alt="Markdown">
 </p>
 
 ## Overview
@@ -9,6 +22,10 @@
 This Retrieval-Augmented Generation (RAG) application empowers users to interact with their PDF documents by leveraging Google's Gemini AI. It intelligently combines document retrieval with advanced generative AI capabilities to provide accurate, context-aware answers directly from the content of uploaded PDFs.
 
 The application features a modern, intuitive interface with advanced voice recognition capabilities, supporting multiple languages and providing real-time transcription for an enhanced user experience.
+
+<p align="center">
+  <img src="rag-frontend/src/assets/Capture_d'écran.png" alt="Application Screenshot" width="600"/>
+</p>
 
 ## Table of Contents
 
