@@ -6,12 +6,33 @@ import {
   HiUser,
   HiSparkles,
   HiPaperClip,
-  HiPaperAirplane,
   HiChatBubbleLeftRight,
   HiSun,
   HiMoon,
+  HiMicrophone,
+  HiStop,
+  HiArrowUp,
 } from "react-icons/hi2";
 import logo from "./assets/logo.png";
+
+// Déclaration des types pour Web Speech API
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    webkitSpeechRecognition: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    SpeechRecognition: any;
+  }
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -23,14 +44,128 @@ function App() {
   const [userQuery, setUserQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+
+  // États pour la reconnaissance vocale
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [isRecognitionSupported, setIsRecognitionSupported] =
+    useState<boolean>(false);
+  const [interimTranscript, setInterimTranscript] = useState<string>("");
+  const [currentLanguage, setCurrentLanguage] = useState<string>("fr-FR");
+
   const chatHistoryRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (chatHistoryRef.current) {
       chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
     }
   }, [chatHistory]);
+
+  // Initialisation de la reconnaissance vocale
+  useEffect(() => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+      setIsRecognitionSupported(true);
+      const recognition = new SpeechRecognition();
+
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = currentLanguage; // Utilise la langue sélectionnée
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setInterimTranscript("");
+      };
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interimTranscript = "";
+        let finalTranscript = "";
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript;
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+
+        setInterimTranscript(interimTranscript);
+
+        if (finalTranscript) {
+          setUserQuery((prev) => prev + finalTranscript + " ");
+        }
+      };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error("Erreur de reconnaissance vocale:", event.error);
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+        setInterimTranscript("");
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, [currentLanguage]); // Redémarrer quand la langue change
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      recognitionRef.current.start();
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+    }
+  };
+
+  const toggleListening = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  };
+
+  // Fonction pour ajuster automatiquement la hauteur du textarea
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the actual scrollHeight
+      textarea.style.height = "auto";
+
+      // Calculate new height with limits
+      const scrollHeight = textarea.scrollHeight;
+      const minHeight = 52; // hauteur minimale (approximativement 1 ligne + padding)
+      const maxHeight = 200; // hauteur maximale (approximativement 5-6 lignes)
+      const threeLineHeight = 120; // hauteur approximative pour 3 lignes
+
+      const newHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
+      textarea.style.height = `${newHeight}px`;
+
+      // Afficher le scroll seulement si le contenu dépasse 3 lignes
+      if (scrollHeight > threeLineHeight) {
+        textarea.style.overflowY = "auto";
+      } else {
+        textarea.style.overflowY = "hidden";
+      }
+    }
+  };
+
+  // useEffect pour ajuster la hauteur quand le contenu change
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [userQuery, interimTranscript]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -138,6 +273,35 @@ function App() {
     setIsDarkMode(!isDarkMode);
   };
 
+  // Fonction pour changer la langue de reconnaissance vocale
+  const handleLanguageChange = (language: string) => {
+    setCurrentLanguage(language);
+    // Arrêter l'écoute en cours si active
+    if (isListening) {
+      stopListening();
+    }
+  };
+
+  // Langues supportées
+  const supportedLanguages = [
+    { code: "fr-FR", name: "Français", flag: "🇫🇷" },
+    { code: "en-US", name: "English", flag: "🇺🇸" },
+    { code: "ar-SA", name: "العربية", flag: "🇸🇦" },
+  ];
+
+  // Fonction pour obtenir le placeholder selon la langue
+  const getPlaceholder = () => {
+    switch (currentLanguage) {
+      case "en-US":
+        return "Ask something about the document...";
+      case "ar-SA":
+        return "اسأل شيئاً عن الوثيقة...";
+      case "fr-FR":
+      default:
+        return "Posez une question sur le document...";
+    }
+  };
+
   return (
     <div
       className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
@@ -168,20 +332,45 @@ function App() {
                   </span>
                 </h1>
               </div>
-              <button
-                onClick={toggleDarkMode}
-                className={`p-2 rounded-lg transition-colors ${
-                  isDarkMode
-                    ? "text-gray-300 hover:text-white hover:bg-gray-800"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                }`}
-                aria-label="Toggle dark mode">
-                {isDarkMode ? (
-                  <HiSun className="text-xl" />
-                ) : (
-                  <HiMoon className="text-xl" />
+
+              <div className="flex items-center space-x-3">
+                {/* Sélecteur de langue */}
+                {isRecognitionSupported && (
+                  <div className="relative">
+                    <select
+                      value={currentLanguage}
+                      onChange={(e) => handleLanguageChange(e.target.value)}
+                      className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                        isDarkMode
+                          ? "bg-gray-800 border-gray-600 text-white"
+                          : "bg-white border-gray-200 text-gray-900"
+                      }`}
+                      title="Choisir la langue de reconnaissance vocale">
+                      {supportedLanguages.map((lang) => (
+                        <option key={lang.code} value={lang.code}>
+                          {lang.flag} {lang.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 )}
-              </button>
+
+                {/* Bouton thème */}
+                <button
+                  onClick={toggleDarkMode}
+                  className={`p-2 rounded-lg transition-colors ${
+                    isDarkMode
+                      ? "text-gray-300 hover:text-white hover:bg-gray-800"
+                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                  }`}
+                  aria-label="Toggle dark mode">
+                  {isDarkMode ? (
+                    <HiSun className="text-xl" />
+                  ) : (
+                    <HiMoon className="text-xl" />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -438,20 +627,30 @@ function App() {
               />
               <div className="flex-1 relative">
                 <textarea
-                  value={userQuery}
-                  onChange={(e) => setUserQuery(e.target.value)}
-                  placeholder="Ask something about the document..."
+                  ref={textareaRef}
+                  value={
+                    userQuery + (interimTranscript ? interimTranscript : "")
+                  }
+                  onChange={(e) => {
+                    setUserQuery(e.target.value);
+                    // Ajuster la hauteur après le changement
+                    setTimeout(adjustTextareaHeight, 0);
+                  }}
+                  placeholder={getPlaceholder()}
                   disabled={isLoading}
                   rows={1}
-                  className={`w-full resize-none border rounded-2xl px-14 py-4 pr-14 text-base shadow-sm transition-colors focus:outline-none focus:ring-1 ${
+                  style={{ resize: "none" }}
+                  className={`w-full border rounded-2xl px-14 py-4 pr-20 text-base shadow-sm transition-all duration-200 focus:outline-none focus:ring-1 ${
                     isDarkMode
                       ? "border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:ring-gray-500 focus:border-gray-500"
                       : "border-gray-200 bg-white text-gray-900 placeholder-gray-500 focus:ring-gray-400 focus:border-gray-400"
                   }`}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      handleChatSubmit(e);
+                    // Permettre le passage à la ligne avec Entrée
+                    // Pour envoyer, il faut utiliser le bouton d'envoi
+                    if (e.key === "Enter") {
+                      // Ne pas empêcher le comportement par défaut, permettre le saut de ligne
+                      return;
                     }
                   }}
                 />
@@ -466,11 +665,44 @@ function App() {
                   disabled={isUploading}>
                   <HiPaperClip className="text-lg" />
                 </button>
+
+                {/* Bouton micro */}
+                {isRecognitionSupported && (
+                  <button
+                    type="button"
+                    className={`absolute right-14 bottom-4 w-10 h-10 transition-all duration-200 flex items-center justify-center rounded-xl ${
+                      isListening
+                        ? isDarkMode
+                          ? "text-red-400 bg-red-900/30 hover:bg-red-900/50"
+                          : "text-red-500 bg-red-100 hover:bg-red-200"
+                        : isDarkMode
+                        ? "text-gray-400 hover:text-gray-300 hover:bg-gray-700"
+                        : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    } ${isListening ? "animate-pulse" : ""}`}
+                    onClick={toggleListening}
+                    disabled={isLoading}
+                    title={
+                      isListening
+                        ? "Arrêter l'enregistrement"
+                        : `Commencer l'enregistrement vocal (${
+                            supportedLanguages.find(
+                              (lang) => lang.code === currentLanguage
+                            )?.name
+                          })`
+                    }>
+                    {isListening ? (
+                      <HiStop className="text-lg" />
+                    ) : (
+                      <HiMicrophone className="text-lg" />
+                    )}
+                  </button>
+                )}
+
                 <button
                   type="submit"
                   disabled={isLoading || !userQuery.trim()}
                   className="absolute right-3 bottom-4 w-10 h-10 bg-gray-600 text-white rounded-xl hover:bg-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center transition-all duration-200 shadow-sm hover:shadow-md">
-                  <HiPaperAirplane className="text-lg" />
+                  <HiArrowUp className="text-lg" />
                 </button>
               </div>
             </form>
