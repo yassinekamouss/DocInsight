@@ -44,7 +44,6 @@ The application features a modern, intuitive interface with advanced voice recog
 - [Troubleshooting](#troubleshooting)
   - [Common Issues & Solutions](#common-issues--solutions)
   - [Support](#support)
-- [Future Enhancements](#future-enhancements)
 
 ## Key Features
 
@@ -389,52 +388,7 @@ We welcome contributions to this project! Please follow these steps:
 
 ### Support
 
-For any questions, bug reports, or feature requests, please open an issue on the GitHub repository.
-
----
-
-## Future Enhancements
-
-We are continuously working to improve this application. Planned enhancements include:
-
-### 📄 Document Support
-
-- Support for multiple document formats (Word, TXT, Markdown, Excel, PowerPoint)
-- Batch document upload and processing
-- Document version control and history
-- OCR support for scanned documents
-
-### 🌐 Language & Accessibility
-
-- Automatic language detection for voice input
-- Text-to-speech functionality for AI responses
-- Additional language support for voice recognition (Spanish, German, Italian, etc.)
-- Multi-language support for the interface
-- Enhanced accessibility features and ARIA compliance
-
-### 🎯 User Experience
-
-- User authentication and session management for personalized experiences
-- Conversation export functionality (PDF, JSON, Markdown)
-- Advanced search and filtering capabilities within conversations
-- Keyboard shortcuts and voice commands for UI navigation
-- Customizable themes and interface preferences
-
-### 🔧 Technical Improvements
-
-- Docker containerization for easier deployment
-- Real-time collaboration features
-- Advanced caching mechanisms for faster responses
-- Progressive Web App (PWA) capabilities
-- Offline mode for cached conversations
-
-### 📊 Analytics & Management
-
-- A dedicated document management dashboard
-- Usage analytics and conversation insights
-- Document tagging and categorization
-- Advanced RAG techniques (multi-vector retrieval, hybrid search)
-- Integration with cloud storage providers (Google Drive, Dropbox, OneDrive)
+For any questions, bug reports, or feature requests, please open an issue on the GitHub repository or contact us directly at **yassinekamouss76@gmail.com**.
 
 ---
 
